@@ -1,0 +1,24 @@
+pipeline:
+  input_dir: "./raw_docs"
+  output_dir: "./output"
+  mode: "local"          # local or cloud
+  max_file_size_mb: 256  # oversized files are skipped, not ingested
+
+marker:
+  use_llm_extraction: true
+  extract_metadata: true
+
+deduplication:
+  similarity_threshold: 0.85
+  strategy: "smart_merge"  # keep_first, keep_latest, smart_merge
+
+cross_reference:
+  enabled: true
+  min_common_entities: 2
+  max_refs_per_doc: 5
+
+compression:
+  remove_stopwords: true
+  apply_stemming: true
+  normalize_headers: true
+  language: "auto"       # auto, en, es

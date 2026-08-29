@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Environments
+.env
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+
+# Termite workspace conventions
+raw_docs/*
+!raw_docs/.gitkeep
+output/*
+!output/.gitkeep

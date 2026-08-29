@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a reproducible bug
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened vs what you expected?
+      placeholder: Describe the bug and how to reproduce it.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >
+        Termite version (`termite --version`), Python version, OS, input
+        formats involved.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Statistics block and log excerpt
+      description: Run with `--stats -v --log-level DEBUG` (anonymize as needed).
+      render: shell
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproducer
+      description: Minimal input directory / config that reproduces the issue.

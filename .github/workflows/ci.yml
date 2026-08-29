@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (ruff + black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: black --check src tests
+
+  test:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    name: tests (${{ matrix.python-version }}/${{ matrix.os-short || 'linux' }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev,stemming]"
+      - run: pytest tests/ -q --timeout=120
+        env:
+          PYTEST_ADDOPTS: ""
+
+  build:
+    name: Package build
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/*.tar.gz
