@@ -69,6 +69,40 @@ class TestGenerateOutput:
         assert metadata["original_tokens"] > 0
         assert metadata["compressed_tokens"] > 0
 
+    def test_compression_ratio_measured_from_pre_compression_baseline(self):
+        """Ratio must compare pre- vs post-compression sizes.
+
+        Regression: the pipeline used to compress documents before
+        handing them to ``generate_output``, which then measured
+        "original" tokens on already-compressed input — reporting a
+        near-zero ratio even when real compression was ~33%.
+        """
+        from termite.config import TermiteConfig
+
+        config = TermiteConfig()
+        config.compression.remove_stopwords = True
+        config.compression.apply_stemming = True
+        config.compression.language = "en"
+        generator = OutputGenerator(config)
+        prose = (
+            "This is a fairly verbose English sentence that contains a "
+            "number of common stopwords and function words that should "
+            "be removed during the lexical compression phase of the "
+            "pipeline without losing any of the important meaning."
+        )
+        docs = [self._make_doc("doc1", prose, "Doc A")]
+
+        _, metadata = generator.generate_output(docs)
+
+        original = metadata["original_tokens"]
+        compressed = metadata["compressed_tokens"]
+        ratio = metadata["compression_ratio"]
+        # Prose with stopwords must compress by a meaningful amount.
+        assert original > compressed
+        assert ratio > 0.10, f"expected >=10% compression, got {ratio:.1%}"
+        # Sanity: the ratio must equal 1 - compressed/original exactly.
+        assert abs(ratio - (1.0 - compressed / original)) < 1e-9
+
     @staticmethod
     def _make_doc(doc_id: str, content: str, title: str = "") -> ParsedDocument:
         """Helper to create test documents."""
