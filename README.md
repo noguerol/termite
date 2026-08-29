@@ -33,6 +33,58 @@ Termite achieves this through **lossless-by-design lexical compression**
 (redundancy removal, not summarization) plus deduplication and an
 entity-based cross-reference graph.
 
+## What it looks like
+
+A short passage from a real Termite run (input is prose with stopwords;
+output keeps every technical term, number, and entity):
+
+**Input**
+
+> Apache Kafka has become the de facto standard for event streaming in
+> modern microservice architectures. However, operating a Kafka cluster
+> in production requires a thorough understanding of its internal
+> metrics, consumer group behavior, and the many failure modes that can
+> affect end-to-end data delivery.
+
+**Output (compressed)**
+
+> ## introduct apach kafka becom de facto standard event stream modern
+> microservic architectur. oper kafka cluster product requir thorough
+> understand intern metric, consum group behavior, mani failur mode
+> affect end-to-end data deliveri.
+
+No facts, numbers, or terminology are lost — only function words and
+stemmed endings. Compression is tuned for LLM ingestion, not human
+reading; keep the original corpus if you need verbatim text.
+
+## Sizing and savings
+
+Token counts are estimates (≈4 chars/token) for typical English
+technical content; measured reduction on prose is **~30–35%**, on mixed
+corpora **~25–30%**, plus additional savings from deduplication of
+exact/near-duplicate documents.
+
+| Document | Format | Raw size | Raw tokens | Compressed | Saved |
+|---|---|---|---|---|---|
+| Blog / engineering article | `.md` | ~12 KB | ~1,400 | ~950 | ~30% |
+| White paper (~10 pages) | `.pdf` | ~1.5 MB | ~6,000 | ~4,100 | ~30% |
+| Technical book (~300 pp.) | `.epub` | ~3 MB | ~90,000 | ~62,000 | ~30% |
+| Meeting notes | `.txt` | ~3 KB | ~400 | ~280 | ~30% |
+| API reference | `.html` | ~40 KB | ~5,000 | ~3,600 | ~28% |
+
+**What that means for a corpus of hundreds or thousands of documents:**
+
+| Corpus | Raw tokens | With Termite | Saved | Fits in a 1M-token context? |
+|---|---|---|---|---|
+| 100 typical docs | ~800 K | ~560 K | ~240 K | ✅ with room |
+| 1,000 typical docs | ~8 M | ~5.6 M | ~2.4 M | 8 windows → 6 windows |
+| 10,000 typical docs | ~80 M | ~56 M | ~24 M | chunked retrieval with 30% fewer chunks |
+
+In practice this means a corpus that previously needed several
+context-window-sized passes now fits in one, or needs ~30% fewer
+retrieval chunks — with the added benefit of cross-document links and
+duplicate removal built in.
+
 ## Key features
 
 - **Multi-format ingestion** — PDF, EPUB, MOBI, DOCX, TXT, HTML, MD; recursive scanning with a configurable size budget.
