@@ -33,7 +33,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
-    name: tests (${{ matrix.python-version }}/${{ matrix.os-short || 'linux' }})
+    name: tests (${{ matrix.python-version }}/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
