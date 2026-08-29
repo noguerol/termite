@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/termite-banner.png" alt="Termite — a dragon devouring documents" width="100%" />
+</p>
+
 # Termite
 
 **High-performance document compression and structuring for LLM ingestion.**
