@@ -7,7 +7,7 @@
 ```bash
 pip install -e .        # from a source checkout
 # or
-pip install termite
+pip install git+https://github.com/noguerol/termite.git
 ```
 
 ### `termite: command not found`
@@ -44,7 +44,7 @@ export DATALAB_API_KEY=...
 
 Lexical compression is **opt-in**: enable `remove_stopwords` and/or
 `apply_stemming` in `config.yaml`. Stemming additionally requires
-`pip install "termite[stemming]"`; without NLTK a warning is logged and
+`pip install -e ".[stemming]"`; without NLTK a warning is logged and
 stemming is skipped.
 
 ### Spanish not being compressed as expected

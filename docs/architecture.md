@@ -117,7 +117,7 @@ Discovery → Parsing → Deduplication → Entity graph → Compression → Out
   via a dedicated longest-first regex pass. `filter_stopwords()` accepts
   a `whitelist` to protect terms.
 - **Stemming** (optional): Snowball (ES/EN) via NLTK when installed
-  (`pip install "termite[stemming]"`); a warning is logged when
+  (`pip install -e ".[stemming]"`); a warning is logged when
   stemming is enabled without NLTK, and the step is skipped instead of
   failing silently.
 - **Code preservation**: fenced and inline code spans are split out and

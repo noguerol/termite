@@ -40,7 +40,7 @@ tuned for technical documentation.
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `remove_stopwords` | bool | `false` | Remove language-specific stopwords (EN/ES lists built in; Spanish phrases handled). Code spans are never modified. |
-| `apply_stemming` | bool | `false` | Reduce words to stems using Snowball (requires `pip install "termite[stemming]"`; skipped with a warning if NLTK is missing). |
+| `apply_stemming` | bool | `false` | Reduce words to stems using Snowball (requires `pip install -e ".[stemming]"`; skipped with a warning if NLTK is missing). |
 | `normalize_headers` | bool | `true` | Collapse Markdown headers to at most H2. |
 | `language` | `auto` \| `en` \| `es` | `auto` | Force the compression language, or detect per text. |
 
