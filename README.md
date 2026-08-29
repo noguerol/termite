@@ -46,44 +46,68 @@ output keeps every technical term, number, and entity):
 > metrics, consumer group behavior, and the many failure modes that can
 > affect end-to-end data delivery.
 
-**Output (compressed)**
+**Output (compressed)** — verbatim from the run:
 
-> ## introduct apach kafka becom de facto standard event stream modern
-> microservic architectur. oper kafka cluster product requir thorough
-> understand intern metric, consum group behavior, mani failur mode
-> affect end-to-end data deliveri.
+```text
+apach kafka becom de facto standard event stream modern microservic architectur. oper kafka cluster product requir thorough understand intern metric, consum group behavior, mani failur mode affect end-to-end data deliveri. document provid practic guid monitor kafka cluster, focus latenc, throughput, data integr.
+```
 
 No facts, numbers, or terminology are lost — only function words and
 stemmed endings. Compression is tuned for LLM ingestion, not human
 reading; keep the original corpus if you need verbatim text.
 
+## What gets compressed (and what does not)
+
+Compression operates on the **extracted text** — the prose Termite
+parses out of each container — not on the binary file. What you save
+depends on the *content*, not the format:
+
+| Format | What Termite extracts | Compression potential |
+|---|---|---|
+| `.md`, `.txt` | Plain text, verbatim | Prose-heavy: ~30–35% |
+| `.pdf` | Text layer (via marker / pypdf) | Prose: ~30%; image-heavy or scanned pages: little to none |
+| `.epub` | Spine text, XML markup stripped | Prose: ~30%; the XML overhead disappears entirely |
+| `.docx` | Text via marker, XML markup stripped | Prose: ~30% |
+| `.html` | Text with tags stripped | Mixed prose/code: ~25–30% |
+
+Caveats worth knowing:
+
+- **Scanned PDFs** have no text layer — they are images. Termite needs
+  text-based PDFs; scanned documents require OCR *before* ingestion.
+- **A PDF's file size tells you nothing about its text**: a 10 MB PDF
+  can hold a few paragraphs plus embedded fonts/images, while a 500 KB
+  one can hold 30 pages of dense prose. Only the extracted text
+  matters for tokens.
+- **EPUB/DOCX/HTML wrap their content in markup**; that markup is
+  stripped during parsing, so you never pay tokens for XML tags.
+
 ## Sizing and savings
 
 Token counts are estimates (≈4 chars/token) for typical English
-technical content; measured reduction on prose is **~30–35%**, on mixed
-corpora **~25–30%**, plus additional savings from deduplication of
-exact/near-duplicate documents.
+technical content, and refer to *extracted text* (not file size):
 
-| Document | Format | Raw size | Raw tokens | Compressed | Saved |
-|---|---|---|---|---|---|
-| Blog / engineering article | `.md` | ~12 KB | ~1,400 | ~950 | ~30% |
-| White paper (~10 pages) | `.pdf` | ~1.5 MB | ~6,000 | ~4,100 | ~30% |
-| Technical book (~300 pp.) | `.epub` | ~3 MB | ~90,000 | ~62,000 | ~30% |
-| Meeting notes | `.txt` | ~3 KB | ~400 | ~280 | ~30% |
-| API reference | `.html` | ~40 KB | ~5,000 | ~3,600 | ~28% |
-
-**What that means for a corpus of hundreds or thousands of documents:**
-
-| Corpus | Raw tokens | With Termite | Saved | Fits in a 1M-token context? |
+| Content type | Format | Raw tokens | Compressed | Saved |
 |---|---|---|---|---|
-| 100 typical docs | ~800 K | ~560 K | ~240 K | ✅ with room |
-| 1,000 typical docs | ~8 M | ~5.6 M | ~2.4 M | 8 windows → 6 windows |
-| 10,000 typical docs | ~80 M | ~56 M | ~24 M | chunked retrieval with 30% fewer chunks |
+| Blog / engineering article (prose) | `.md` | ~1,400 | ~950 | ~30% |
+| White paper, prose (~10 pages) | `.pdf` | ~6,000 | ~4,100 | ~30% |
+| Technical book, prose (~300 pp.) | `.epub` | ~90,000 | ~62,000 | ~30% |
+| Meeting notes | `.txt` | ~400 | ~280 | ~30% |
+| API reference (mixed prose/code) | `.html` | ~5,000 | ~3,600 | ~28% |
+| Spec sheet, tables, figures | `.pdf` | varies | minimal | ~0–10% |
+
+**What that means for a corpus of hundreds or thousands of documents**
+(token savings are content-dependent; these assume prose-heavy docs):
+
+| Corpus | Raw tokens | With Termite | Saved | 1M-token context windows |
+|---|---|---|---|---|
+| 100 typical docs | ~800 K | ~560 K | ~240 K | 1 window, with room |
+| 1,000 typical docs | ~8 M | ~5.6 M | ~2.4 M | 8 → 6 windows |
+| 10,000 typical docs | ~80 M | ~56 M | ~24 M | 80 → 56 windows |
 
 In practice this means a corpus that previously needed several
-context-window-sized passes now fits in one, or needs ~30% fewer
-retrieval chunks — with the added benefit of cross-document links and
-duplicate removal built in.
+context-window-sized passes now fits in fewer, or needs ~30% fewer
+retrieval chunks — with cross-document links and duplicate removal
+built in.
 
 ## Key features
 
@@ -99,8 +123,8 @@ duplicate removal built in.
 ## Installation
 
 ```bash
-# From PyPI (when published)
-pip install termite
+# From GitHub (recommended; package not yet on PyPI)
+pip install git+https://github.com/noguerol/termite.git
 
 # From a source checkout
 pip install -e .
