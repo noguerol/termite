@@ -93,10 +93,13 @@ class OutputGenerator:
             ]
 
         # Step 3: Compress documents
+        # Measure the baseline before compression so the ratio reflects
+        # true compression of the deduplicated corpus (in the pipeline
+        # path, the documents passed in are pre-compression).
+        original_tokens = sum(doc.total_tokens() for doc in dedup_docs)
         compressed_docs = [self.compressor.compress_document(doc) for doc in dedup_docs]
 
         # Step 4: Calculate metadata
-        original_tokens = sum(doc.total_tokens() for doc in documents)
         compressed_tokens = sum(doc.total_tokens() for doc in compressed_docs)
 
         metadata: OutputMetadata = {

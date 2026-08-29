@@ -154,18 +154,14 @@ class TermitePipeline:
                 stats = self.graph.get_statistics()
                 print(f"Created {stats['total_cross_references']} cross-references")
 
-        # Step 5: Compress documents
-        if verbose:
-            print("Compressing documents...")
-
-        compressed_docs = [self.compressor.compress_document(doc) for doc in deduplicated_docs]
-
-        # Step 6: Generate output
+        # Step 5: Generate output (the generator applies lexical
+        # compression internally and measures the true ratio from the
+        # deduplicated, pre-compression baseline)
         if verbose:
             print("Generating output...")
 
         compressed_docs, output_metadata = self.generator.generate_output(
-            compressed_docs,
+            deduplicated_docs,
             inject_cross_references=False,  # Already done above
             deduplicate_input=False,  # Already deduplicated above
         )

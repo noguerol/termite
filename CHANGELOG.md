@@ -45,6 +45,12 @@ Security/enterprise hardening release (public release).
 
 - Pipeline statistics now report `original_tokens` measured **before**
   deduplication and correct `cross_references_created` counts.
+- **Compression ratio was under-reported**: the pipeline compressed
+  documents and then handed already-compressed documents to the output
+  generator, which compressed again and measured its "original" baseline
+  on that input — reporting ~0% even when real compression was ~30–40%.
+  Compression is now applied exactly once and the ratio compares the
+  pre-compression deduplicated baseline against the final output.
 - `compression.language` configuration option implemented (`auto`/`en`/`es`).
 - Stopword whitelist parameter is honored in `filter_stopwords`;
   multi-word Spanish stopword phrases (`sin embargo`, `por qué`, …) are
