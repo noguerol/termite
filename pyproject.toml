@@ -59,7 +59,7 @@ cloud = [
     "datalab>=1.0.0",
 ]
 spacy = [
-    "spacy>=3.0",
+    "spacy>=3.8.16",
 ]
 all = [
     "termite[dev,marker,cloud,spacy,stemming]",
