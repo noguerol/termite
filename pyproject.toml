@@ -50,7 +50,7 @@ dev = [
     "ruff>=0.16.5",
 ]
 stemming = [
-    "nltk>=3.10.3",
+    "nltk>=3.10.4",
 ]
 marker = [
     "marker-pdf>=2.0.0",
